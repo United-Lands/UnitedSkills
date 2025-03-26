@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.unitedlands.skills.Utils.canActivate;
+import static org.unitedlands.skills.Utils.wasRecentlyPlaced;
 
 public class MinerAbilities implements Listener {
     private final UnitedSkills unitedSkills;
@@ -81,8 +82,8 @@ public class MinerAbilities implements Listener {
             return;
         }
 
-        Block block = event.getBlock();
-        if (Utils.isPlaced(block)) {
+        var block = event.getBlock();
+        if (wasRecentlyPlaced(block)) {
             return;
         }
 

@@ -3,7 +3,6 @@ package org.unitedlands.skills;
 import com.gamingmesh.jobs.Jobs;
 import com.gamingmesh.jobs.container.JobProgression;
 import com.gamingmesh.jobs.container.JobsPlayer;
-import com.gestankbratwurst.playerblocktracker.PlayerBlockTracker;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
@@ -24,7 +23,8 @@ public class Utils {
     @NotNull
     public static Component getMessage(String message) {
         String configMessage = getUnitedSkills().getConfig().getString("messages." + message);
-        return miniMessage.deserialize(Objects.requireNonNullElseGet(configMessage, () -> "<red>Message <yellow>" + message + "<red> could not be found in the config file!"));
+        return miniMessage.deserialize(Objects.requireNonNullElseGet(configMessage,
+                () -> "<red>Message <yellow>" + message + "<red> could not be found in the config file!"));
     }
 
     public static UnitedSkills getUnitedSkills() {
@@ -39,10 +39,12 @@ public class Utils {
 
     public static boolean takeItemFromMaterial(@NotNull Player player, @NotNull Material material) {
         int slot = player.getInventory().first(material);
-        if (slot < 0) return false;
+        if (slot < 0)
+            return false;
 
         ItemStack item = player.getInventory().getItem(slot);
-        if (item == null || item.getType().isAir()) return false;
+        if (item == null || item.getType().isAir())
+            return false;
 
         item.setAmount(item.getAmount() - 1);
         return true;
@@ -52,11 +54,13 @@ public class Utils {
         Inventory inventory = player.getInventory();
 
         int slot = inventory.first(item.getType());
-        if (slot < 0) return false;
+        if (slot < 0)
+            return false;
 
         for (int i = 0; i < inventory.getSize(); i++) {
             ItemStack itemInInventory = inventory.getItem(i);
-            if (itemInInventory == null || itemInInventory.getType().isAir()) continue;
+            if (itemInInventory == null || itemInInventory.getType().isAir())
+                continue;
             if (itemInInventory.getType().equals(item.getType())) {
                 if (itemInInventory.getItemMeta().equals(item.getItemMeta())) {
                     itemInInventory.setAmount(itemInInventory.getAmount() - 1);
@@ -67,17 +71,31 @@ public class Utils {
         return false;
     }
 
-    public static boolean isPlaced(Block block) {
-        return PlayerBlockTracker.isTracked(block);
+    // public static boolean isPlaced(Block block) {
+    // return PlayerBlockTracker.isTracked(block);
+    // }
+
+    public static Boolean wasRecentlyPlaced(Block block) {
+        var placeTime = Jobs.getExploitManager().getTime(block);
+        if (placeTime != null)
+            // Naturally spawned blocks always return a time difference of 2000-3000ms, make
+            // sure to stay above that.
+            if (placeTime - System.currentTimeMillis() > 3000)
+                return true;
+        return false;
     }
 
     public static boolean canActivate(PlayerInteractEvent event, String materialKeyword, ActiveSkill skill) {
-        if (event.getItem() == null) return false;
-        if (!event.getAction().isRightClick()) return false;
+        if (event.getItem() == null)
+            return false;
+        if (!event.getAction().isRightClick())
+            return false;
 
         Player player = event.getPlayer();
-        if (!player.isSneaking()) return false;
-        if (!event.getItem().getType().toString().contains(materialKeyword)) return false;
+        if (!player.isSneaking())
+            return false;
+        if (!event.getItem().getType().toString().contains(materialKeyword))
+            return false;
         return skill.getLevel() != 0;
     }
 

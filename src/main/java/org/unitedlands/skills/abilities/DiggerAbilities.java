@@ -3,7 +3,10 @@ package org.unitedlands.skills.abilities;
 import com.destroystokyo.paper.ParticleBuilder;
 import com.gamingmesh.jobs.Jobs;
 import com.gamingmesh.jobs.actions.BlockActionInfo;
+import com.gamingmesh.jobs.container.ActionInfo;
 import com.gamingmesh.jobs.container.ActionType;
+import com.gamingmesh.jobs.container.JobsPlayer;
+
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
@@ -31,35 +34,41 @@ import java.util.Objects;
 import java.util.UUID;
 
 import static org.unitedlands.skills.Utils.canActivate;
+import static org.unitedlands.skills.Utils.getJobs;
+import static org.unitedlands.skills.Utils.wasRecentlyPlaced;
 
 public class DiggerAbilities implements Listener {
-    private static final int[][] MINING_COORD_OFFSETS = new int[][]{{0, 0}, {0, -1}, {-1, 0}, {0, 1}, {1, 0}, {-1, -1}, {-1, 1}, {1, -1}, {1, 1},};
+    private static final int[][] MINING_COORD_OFFSETS = new int[][] { { 0, 0 }, { 0, -1 }, { -1, 0 }, { 0, 1 },
+            { 1, 0 }, { -1, -1 }, { -1, 1 }, { 1, -1 }, { 1, 1 }, };
     private final UnitedSkills unitedSkills;
     private final HashMap<UUID, Long> cooldowns = new HashMap<>();
     private final HashMap<UUID, Long> durations = new HashMap<>();
     private Player player;
 
-
     public DiggerAbilities(UnitedSkills unitedSkills) {
         this.unitedSkills = unitedSkills;
     }
 
-    @EventHandler (priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onMineralFinderBreak(BlockBreakEvent event) {
         player = event.getPlayer();
-        if (event.isCancelled()) return;
+        if (event.isCancelled())
+            return;
         if (!isDigger()) {
             return;
         }
+
+        var block = event.getBlock();
+        if (wasRecentlyPlaced(block)) {
+            return;
+        }
+        
         Skill mineralFinder = new Skill(player, SkillType.MINERAL_FINDER);
         if (mineralFinder.getLevel() == 0) {
             return;
         }
 
         LootTable mineralFinderLootTable = new LootTable("mineral-finder-loot", mineralFinder);
-        Block block = event.getBlock();
-        if (Utils.isPlaced(block)) return;
-
         ItemStack randomItem = mineralFinderLootTable.getRandomItem(block);
         if (randomItem != null) {
             block.getWorld().dropItem(block.getLocation(), randomItem);
@@ -67,21 +76,26 @@ public class DiggerAbilities implements Listener {
         }
     }
 
-    @EventHandler (priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onArchaeologistBlockBreak(BlockBreakEvent event) {
         player = event.getPlayer();
-        if (event.isCancelled()) return;
+        if (event.isCancelled())
+            return;
         if (!isDigger()) {
             return;
         }
+
+        var block = event.getBlock();
+        if (wasRecentlyPlaced(block)) {
+            return;
+        }
+
         Skill archaeologist = new Skill(player, SkillType.ARCHAEOLOGIST);
         if (archaeologist.getLevel() == 0) {
             return;
         }
 
         LootTable archaeologistLootTable = new LootTable("archaeologist-loot", archaeologist);
-        Block block = event.getBlock();
-        if (Utils.isPlaced(block)) return;
 
         ItemStack randomItem = archaeologistLootTable.getRandomItem(block);
         if (randomItem != null) {
@@ -96,14 +110,17 @@ public class DiggerAbilities implements Listener {
         if (!isDigger()) {
             return;
         }
-        Skill excavator = new Skill(player, SkillType.EXCAVATOR);
-        if (Utils.isPlaced(event.getBlock())) {
+
+        if (wasRecentlyPlaced(event.getBlock())) {
             return;
         }
+
+        Skill excavator = new Skill(player, SkillType.EXCAVATOR);
         if (excavator.isSuccessful()) {
             List<Item> items = event.getItems();
             for (Item item : items) {
-                if (Objects.requireNonNull(unitedSkills.getConfig().getList("excavator-items")).contains(item.getItemStack().getType().toString())) {
+                if (Objects.requireNonNull(unitedSkills.getConfig().getList("excavator-items"))
+                        .contains(item.getItemStack().getType().toString())) {
                     Utils.multiplyItem(player, item.getItemStack(), 1);
                 }
             }
@@ -187,9 +204,12 @@ public class DiggerAbilities implements Listener {
         int blocksToBreak = 1;
         ActiveSkill tunneller = new ActiveSkill(player, SkillType.TUNNELLER, cooldowns, durations);
         int level = tunneller.getLevel();
-        if (level == 1) blocksToBreak = 2;
-        else if (level == 2) blocksToBreak = 5;
-        else if (level == 3) blocksToBreak = 9;
+        if (level == 1)
+            blocksToBreak = 2;
+        else if (level == 2)
+            blocksToBreak = 5;
+        else if (level == 3)
+            blocksToBreak = 9;
 
         for (int i = 0; i < blocksToBreak; i++) {
             ItemStack item = player.getInventory().getItemInMainHand();
@@ -206,23 +226,31 @@ public class DiggerAbilities implements Listener {
                 neighbourBlock = block.getLocation().clone().add(xAdd, 0, zAdd).getBlock();
             }
             // Skip blocks that should not be mined
-            if (neighbourBlock.equals(block)) continue;
-            // Skip any stuff that shovels wouldn't drop, and make sure the level is 1 (i.e. can't break stone)
-            if (neighbourBlock.getDrops(item).isEmpty()) continue;
-            if (neighbourBlock.isLiquid()) continue;
+            if (neighbourBlock.equals(block))
+                continue;
+            // Skip any stuff that shovels wouldn't drop, and make sure the level is 1 (i.e.
+            // can't break stone)
+            if (neighbourBlock.getDrops(item).isEmpty())
+                continue;
+            if (neighbourBlock.isLiquid())
+                continue;
 
             Material neighbourBlockType = neighbourBlock.getType();
 
             // Some extra block checks.
             if (neighbourBlockType.isInteractable() && !(neighbourBlockType.equals(Material.REDSTONE_ORE)
-                    || neighbourBlockType.equals(Material.DEEPSLATE_REDSTONE_ORE))) continue;
-            if (neighbourBlockType == Material.BEDROCK || neighbourBlockType == Material.END_PORTAL || neighbourBlockType == Material.END_PORTAL_FRAME)
+                    || neighbourBlockType.equals(Material.DEEPSLATE_REDSTONE_ORE)))
                 continue;
-            if (neighbourBlockType == Material.OBSIDIAN && neighbourBlockType != block.getType()) continue;
+            if (neighbourBlockType == Material.BEDROCK || neighbourBlockType == Material.END_PORTAL
+                    || neighbourBlockType == Material.END_PORTAL_FRAME)
+                continue;
+            if (neighbourBlockType == Material.OBSIDIAN && neighbourBlockType != block.getType())
+                continue;
 
             spawnBlockBreakParticles(neighbourBlock);
 
-            Jobs.action(Jobs.getPlayerManager().getJobsPlayer(player), new BlockActionInfo(neighbourBlock, ActionType.BREAK), neighbourBlock);
+            Jobs.action(Jobs.getPlayerManager().getJobsPlayer(player),
+                    new BlockActionInfo(neighbourBlock, ActionType.BREAK), neighbourBlock);
             neighbourBlock.breakNaturally();
         }
     }

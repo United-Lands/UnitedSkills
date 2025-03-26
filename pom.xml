@@ -6,7 +6,7 @@
 
     <groupId>org.unitedlands</groupId>
     <artifactId>UnitedSkills</artifactId>
-    <version>3.6.9b</version>
+    <version>3.6.10</version>
     <packaging>jar</packaging>
 
     <name>UnitedSkills</name>
@@ -100,8 +100,13 @@
         <dependency>
             <groupId>com.github.Zrips</groupId>
             <artifactId>Jobs</artifactId>
-            <version>v4.17.2</version>
+            <version>v5.2.4.5</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.Zrips</groupId>
+            <artifactId>CMILib</artifactId>
+            <version>1.4.7.4</version>
         </dependency>
         <dependency>
             <groupId>com.craftaro.ultimatetimber</groupId>
@@ -130,12 +135,6 @@
             <groupId>me.clip</groupId>
             <artifactId>placeholderapi</artifactId>
             <version>2.10.9</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.Flo0</groupId>
-            <artifactId>PlayerBlockTracker</artifactId>
-            <version>1.0.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
