@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.unitedlands.skills.Utils.canActivate;
+import static org.unitedlands.skills.Utils.wasRecentlyPlaced;
 
 public class MinerAbilities implements Listener {
     private final UnitedSkills unitedSkills;
@@ -81,11 +82,6 @@ public class MinerAbilities implements Listener {
             return;
         }
 
-        Block block = event.getBlock();
-        if (Utils.isPlaced(block)) {
-            return;
-        }
-
         ItemStack pickaxe = player.getInventory().getItemInMainHand();
         String materialName = event.getBlockState().getType().toString();
         // Ores should not duplicate if the user has silk touch.
@@ -96,6 +92,10 @@ public class MinerAbilities implements Listener {
         Skill fortunate = new Skill(player, SkillType.FORTUNATE);
         List<Item> items = event.getItems();
         if (fortunate.isSuccessful()) {
+            if (wasRecentlyPlaced(event.getBlock())) {
+                return;
+            }
+    
             for (Item item : items) {
                 if (materialName.contains("_ORE")) {
                     Utils.multiplyItem(player, item.getItemStack(), 1);
