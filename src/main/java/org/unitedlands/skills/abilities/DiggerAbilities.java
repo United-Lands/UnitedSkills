@@ -58,13 +58,13 @@ public class DiggerAbilities implements Listener {
             return;
         }
 
-        var block = event.getBlock();
-        if (wasRecentlyPlaced(block)) {
-            return;
-        }
-        
         Skill mineralFinder = new Skill(player, SkillType.MINERAL_FINDER);
         if (mineralFinder.getLevel() == 0) {
+            return;
+        }
+
+        var block = event.getBlock();
+        if (wasRecentlyPlaced(block)) {
             return;
         }
 
@@ -85,13 +85,13 @@ public class DiggerAbilities implements Listener {
             return;
         }
 
-        var block = event.getBlock();
-        if (wasRecentlyPlaced(block)) {
+        Skill archaeologist = new Skill(player, SkillType.ARCHAEOLOGIST);
+        if (archaeologist.getLevel() == 0) {
             return;
         }
 
-        Skill archaeologist = new Skill(player, SkillType.ARCHAEOLOGIST);
-        if (archaeologist.getLevel() == 0) {
+        var block = event.getBlock();
+        if (wasRecentlyPlaced(block)) {
             return;
         }
 
@@ -111,12 +111,11 @@ public class DiggerAbilities implements Listener {
             return;
         }
 
-        if (wasRecentlyPlaced(event.getBlock())) {
-            return;
-        }
-
         Skill excavator = new Skill(player, SkillType.EXCAVATOR);
         if (excavator.isSuccessful()) {
+            if (wasRecentlyPlaced(event.getBlock())) {
+                return;
+            }
             List<Item> items = event.getItems();
             for (Item item : items) {
                 if (Objects.requireNonNull(unitedSkills.getConfig().getList("excavator-items"))

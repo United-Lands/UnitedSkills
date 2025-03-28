@@ -77,11 +77,16 @@ public class Utils {
 
     public static Boolean wasRecentlyPlaced(Block block) {
         var placeTime = Jobs.getExploitManager().getTime(block);
-        if (placeTime != null)
-            // Naturally spawned blocks always return a time difference of 2000-3000ms, make
+        if (placeTime != null) {
+            // Naturally spawned blocks always return global break time, make
             // sure to stay above that.
-            if (placeTime - System.currentTimeMillis() > 3000)
+            getUnitedSkills().getLogger().info("t1:" + placeTime + ", t2: " + System.currentTimeMillis() + ", d: " + (placeTime - System.currentTimeMillis()));
+            if (placeTime - System.currentTimeMillis() > 60000)
                 return true;
+        }
+        else {
+            getUnitedSkills().getLogger().info("t1: NULL");
+        }
         return false;
     }
 

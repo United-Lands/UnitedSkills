@@ -123,11 +123,7 @@ public class WoodcutterAbilities implements Listener {
         if (!material.toString().contains("LOG")) {
             return;
         }
-        var block = event.getBlock();
-        if (wasRecentlyPlaced(block)) {
-            return;
-        }
-        
+
         // Perform towny check to see if player is allowed to break blocks in that location
         if (!PlayerCacheUtil.getCachePermission(player, event.getBlock().getLocation(), event.getBlock().getType(),
                 TownyPermission.ActionType.DESTROY)) {
@@ -135,6 +131,9 @@ public class WoodcutterAbilities implements Listener {
         }
 
         if (precisionCutting.isSuccessful()) {
+            if (wasRecentlyPlaced(event.getBlock())) {
+                return;
+            }
             multiplyItem(player, new ItemStack(material), 2);
         }
     }
