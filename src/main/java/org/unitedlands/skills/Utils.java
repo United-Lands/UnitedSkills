@@ -80,12 +80,8 @@ public class Utils {
         if (placeTime != null) {
             // Naturally spawned blocks always return global break time, make
             // sure to stay above that.
-            getUnitedSkills().getLogger().info("t1:" + placeTime + ", t2: " + System.currentTimeMillis() + ", d: " + (placeTime - System.currentTimeMillis()));
             if (placeTime - System.currentTimeMillis() > 60000)
                 return true;
-        }
-        else {
-            getUnitedSkills().getLogger().info("t1: NULL");
         }
         return false;
     }
