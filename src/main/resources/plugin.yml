@@ -7,7 +7,6 @@ depend:
   - Towny
   - UltimateTimber
   - ItemsAdder
-  - PlayerBlockTracker
 authors: [ Maroon28 ]
 description: A plugin built to manage job skills for UnitedLands
 website: unitedlands.org
