@@ -176,7 +176,7 @@ public class MobNetAbilities implements Listener {
             player.playSound(player.getLocation(), "ui.toast.in", 1.0f, 1.0f);
 
         } catch (Exception ex) {
-            player.sendMessage("<red>Error while trying to create Mob Net: " + ex.getMessage());
+            player.sendMessage("§cError while trying to create Mob Net: " + ex.getMessage());
             ex.printStackTrace();
             return;
         }
@@ -275,7 +275,7 @@ public class MobNetAbilities implements Listener {
 
             String capturedMobType = NBT.get(itemInHand, nbt -> (String) nbt.getString("ulc_type"));
             if (capturedMobType == null || capturedMobType == "") {
-                player.sendMessage("<red>Error reading type of captured mob!");
+                player.sendMessage("§cError reading type of captured mob!");
                 return;
             }
 
@@ -329,7 +329,7 @@ public class MobNetAbilities implements Listener {
                 player.playSound(player.getLocation(), "ui.toast.out", 1.0f, 1.0f);
 
             } else {
-                player.sendMessage("<yellow>This is not a valid spawn location!");
+                player.sendMessage("§eThis is not a valid spawn location!");
             }
 
         }
