@@ -727,7 +727,16 @@ frenzy-whitelist:
   - CALCITE
   - BASALT
   - BLACKSTONE
-
+  - DIAMOND
+  - RAW_IRON
+  - RAW_COPPER
+  - RAW_GOLD
+  - LAPIS_LAZULI
+  - COAL
+  - REDSTONE
+  - EMERALD
+  - COBBLESTONE
+  - COBBLED_DEEPSLATE
 messages:
   no-permission: "You do not have permission to execute this command!"
   must-be-hunter: "<red>You must be a hunter to use this mob net!"

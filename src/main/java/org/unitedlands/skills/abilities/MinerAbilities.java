@@ -108,7 +108,7 @@ public class MinerAbilities implements Listener {
             List<String> whitedlistedMaterials = unitedSkills.getConfig().getStringList("frenzy-whitelist");
             for (Item item : items) {
                 // Only duplicate whitelisted materials.
-                if (whitedlistedMaterials.contains(materialName)) {
+                if (whitedlistedMaterials.contains(item.getItemStack().getType().toString())) {
                     Utils.multiplyItem(player, item.getItemStack(), 3);
                 }
             }
