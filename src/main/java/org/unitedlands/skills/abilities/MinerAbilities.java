@@ -106,6 +106,9 @@ public class MinerAbilities implements Listener {
         ActiveSkill frenzy = new ActiveSkill(player, SkillType.FRENZY, cooldowns, durations);
         if (frenzy.isActive()) {
             List<String> whitedlistedMaterials = unitedSkills.getConfig().getStringList("frenzy-whitelist");
+            if (!whitedlistedMaterials.contains(materialName)) {
+                return;
+            }
             for (Item item : items) {
                 // Only duplicate whitelisted materials.
                 if (whitedlistedMaterials.contains(item.getItemStack().getType().toString())) {
