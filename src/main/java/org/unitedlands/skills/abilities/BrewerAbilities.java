@@ -22,9 +22,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.metadata.MetadataValue;
-import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.potion.PotionEffectTypeCategory;
 import org.bukkit.potion.PotionType;
 import org.jetbrains.annotations.NotNull;
 import org.unitedlands.skills.UnitedSkills;
@@ -54,7 +54,7 @@ public class BrewerAbilities implements Listener {
             return;
         }
         player = (Player) entity;
-        if (isBrewer()) {
+        if (!isBrewer()) {
             return;
         }
         if (effect == null) {
@@ -74,7 +74,7 @@ public class BrewerAbilities implements Listener {
     @EventHandler
     public void onItemConsume(PlayerItemConsumeEvent event) {
         player = event.getPlayer();
-        if (isBrewer()) {
+        if (!isBrewer()) {
             return;
         }
 
@@ -83,22 +83,25 @@ public class BrewerAbilities implements Listener {
             return;
         }
         PotionMeta potionMeta = (PotionMeta) item.getItemMeta();
-        PotionData potionData = potionMeta.getBasePotionData();
-        final PotionType potionType = potionData.getType();
-        Skill assistedHealing = new Skill(player, SkillType.ASSISTED_HEALING);
-        if (potionType.equals(PotionType.INSTANT_HEAL) && assistedHealing.getLevel() > 0) {
-            increaseHealingEffect(potionMeta);
-        }
 
-        Skill exposureTherapy = new Skill(player, SkillType.EXPOSURE_THERAPY);
-        if (potionType.equals(PotionType.INSTANT_DAMAGE)) {
-            if (exposureTherapy.isSuccessful()) {
-                player.getInventory().remove(item);
-                player.getInventory().addItem(new ItemStack(Material.GLASS_BOTTLE));
-                player.playSound(player, Sound.BLOCK_NOTE_BLOCK_PLING, 2f, 1f);
-                event.setCancelled(true);
+        var potionEffects = potionMeta.getAllEffects();
+        for (var effect : potionEffects) {
+            Skill assistedHealing = new Skill(player, SkillType.ASSISTED_HEALING);
+            if (effect.getType().equals(PotionEffectType.INSTANT_HEALTH) && assistedHealing.getLevel() > 0) {
+                increaseHealingEffect(potionMeta);
+            }
+
+            Skill exposureTherapy = new Skill(player, SkillType.EXPOSURE_THERAPY);
+            if (effect.getType().getCategory().equals(PotionEffectTypeCategory.HARMFUL)) {
+                if (exposureTherapy.isSuccessful()) {
+                    player.getInventory().remove(item);
+                    player.getInventory().addItem(new ItemStack(Material.GLASS_BOTTLE));
+                    player.playSound(player, Sound.BLOCK_NOTE_BLOCK_PLING, 2f, 1f);
+                    event.setCancelled(true);
+                }
             }
         }
+
     }
 
     @EventHandler
@@ -115,14 +118,15 @@ public class BrewerAbilities implements Listener {
         }
         for (ItemStack item : event.getContents()) {
             PotionMeta potionMeta = (PotionMeta) item.getItemMeta();
-            PotionData basePotionData = potionMeta.getBasePotionData();
 
-            if (basePotionData.isUpgraded()) {
+            var basePotionType = potionMeta.getBasePotionType();
+            if (basePotionType.toString().startsWith("LONG_") || basePotionType.toString().startsWith("STRONG_")) {
                 return;
             }
-            PotionType potionType = basePotionData.getType();
-            PotionData potionData = new PotionData(potionType, basePotionData.isExtended(), true);
-            potionMeta.setBasePotionData(potionData);
+
+            var enhancedPotionType = PotionType.valueOf("LONG_" + basePotionType.toString());
+            potionMeta.setBasePotionType(enhancedPotionType);
+
             item.setItemMeta(potionMeta);
             brewingStand.update();
         }
@@ -135,7 +139,7 @@ public class BrewerAbilities implements Listener {
             return;
         }
         player = (Player) event.getWhoClicked();
-        if (isBrewer()) {
+        if (!isBrewer()) {
             return;
         }
         Skill modifiedHardware = new Skill(player, SkillType.MODIFIED_HARDWARE);
@@ -166,8 +170,10 @@ public class BrewerAbilities implements Listener {
     }
 
     private boolean canStartBrewing(BrewingStand brewingStand) {
-        if (hasBottleOrPotion(brewingStand.getInventory())) return false;
-        if (hasBrewingItem(brewingStand.getInventory())) return false;
+        if (hasBottleOrPotion(brewingStand.getInventory()))
+            return false;
+        if (hasBrewingItem(brewingStand.getInventory()))
+            return false;
         return !hasBlazePowder(brewingStand);
     }
 
@@ -185,7 +191,8 @@ public class BrewerAbilities implements Listener {
 
     private boolean hasBrewingItem(@NotNull Inventory inventory) {
         FileConfiguration config = unitedSkills.getConfig();
-        @NotNull List<String> brewingItems = config.getStringList("brewing-items");
+        @NotNull
+        List<String> brewingItems = config.getStringList("brewing-items");
         ItemStack item = inventory.getItem(3);
         if (item == null) {
             return false;
@@ -238,54 +245,38 @@ public class BrewerAbilities implements Listener {
     @EventHandler
     public void onPotionSplash(PotionSplashEvent event) {
         PotionMeta potionMeta = event.getPotion().getPotionMeta();
-        PotionEffectType potionType = potionMeta.getBasePotionData().getType().getEffectType();
-        for (Entity entity : event.getAffectedEntities()) {
-            if (!(entity instanceof Player)) {
-                return;
-            }
-            player = (Player) entity;
-            if (isBrewer()) {
-                return;
-            }
 
-            Skill exposureTherapy = new Skill(player, SkillType.EXPOSURE_THERAPY);
-            Skill assistedHealing = new Skill(player, SkillType.ASSISTED_HEALING);
-
-            if (potionType == null) {
-                if (potionMeta.hasCustomEffects()) {
-                    potionMeta.getCustomEffects().forEach(effect -> {
-                        if (effect.getType().equals(PotionEffectType.HARM)) {
-                            if (exposureTherapy.isSuccessful()) {
-                                player.playSound(player, Sound.BLOCK_NOTE_BLOCK_PLING, 2f, 1f);
-                                event.setIntensity(player, 0);
-                            }
-                            return;
-                        }
-                        if (effect.getType().equals(PotionEffectType.HEAL)) {
-                            if (assistedHealing.getLevel() > 0) {
-                                event.setIntensity(player, 0);
-                                increaseHealingEffect(potionMeta);
-                            }
-                        }
-                    });
-                }
-                return;
-            }
-            if (potionType.equals(PotionEffectType.HARM)) {
-                if (exposureTherapy.isSuccessful()) {
-                    player.playSound(player, Sound.BLOCK_NOTE_BLOCK_PLING, 2f, 1f);
-                    event.setIntensity(player, 0);
-                }
-            }
-
-            if (assistedHealing.getLevel() > 0) {
-                if (potionType.equals(PotionEffectType.HEAL)) {
-                    event.setIntensity(player, 0);
-                    increaseHealingEffect(potionMeta);
+        var effects = potionMeta.getBasePotionType().getPotionEffects();
+        for (var effect : effects) {
+            for (Entity entity : event.getAffectedEntities()) {
+                if (!(entity instanceof Player)) {
                     return;
+                }
+                player = (Player) entity;
+                if (!isBrewer()) {
+                    return;
+                }
+
+                Skill exposureTherapy = new Skill(player, SkillType.EXPOSURE_THERAPY);
+                Skill assistedHealing = new Skill(player, SkillType.ASSISTED_HEALING);
+
+                if (effect.getType().getCategory().equals(PotionEffectTypeCategory.HARMFUL)) {
+                    if (exposureTherapy.isSuccessful()) {
+                        player.playSound(player, Sound.BLOCK_NOTE_BLOCK_PLING, 2f, 1f);
+                        event.setIntensity(player, 0);
+                    }
+                }
+
+                if (assistedHealing.getLevel() > 0) {
+                    if (effect.getType().getCategory().equals(PotionEffectTypeCategory.BENEFICIAL)) {
+                        event.setIntensity(player, 0);
+                        increaseHealingEffect(potionMeta);
+                        return;
+                    }
                 }
             }
         }
+
     }
 
     private void increaseHealingEffect(PotionMeta potionMeta) {
@@ -293,7 +284,9 @@ public class BrewerAbilities implements Listener {
         int skillLevel = skill.getLevel();
         double health = player.getHealth();
         int healthModifier = skillLevel + 1;
-        if (potionMeta.getBasePotionData().isUpgraded()) {
+
+        var basePotionType = potionMeta.getBasePotionType().toString();
+        if (basePotionType.startsWith("LONG_") || basePotionType.startsWith("STRONG_")) {
             player.setHealth(Math.min(20, health + ((healthModifier + 2) * skillLevel * 2)));
             return;
         }
@@ -301,11 +294,12 @@ public class BrewerAbilities implements Listener {
     }
 
     private boolean isHarmfulEffect(PotionEffect effect) {
-        @NotNull List<String> harmfulPotions = unitedSkills.getConfig().getStringList("harmful-potions");
-        return harmfulPotions.contains(effect.getType().getName());
+        @NotNull
+        List<String> harmfulPotions = unitedSkills.getConfig().getStringList("harmful-potions");
+        return harmfulPotions.contains(effect.getType().toString());
     }
 
     private boolean isBrewer() {
-        return !Utils.isInJob(player, "Brewer");
+        return Utils.isInJob(player, "Brewer");
     }
 }

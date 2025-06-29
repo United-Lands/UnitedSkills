@@ -3,10 +3,7 @@ package org.unitedlands.skills.abilities;
 import com.destroystokyo.paper.ParticleBuilder;
 import com.gamingmesh.jobs.Jobs;
 import com.gamingmesh.jobs.actions.BlockActionInfo;
-import com.gamingmesh.jobs.container.ActionInfo;
 import com.gamingmesh.jobs.container.ActionType;
-import com.gamingmesh.jobs.container.JobsPlayer;
-
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
@@ -34,7 +31,6 @@ import java.util.Objects;
 import java.util.UUID;
 
 import static org.unitedlands.skills.Utils.canActivate;
-import static org.unitedlands.skills.Utils.getJobs;
 import static org.unitedlands.skills.Utils.wasRecentlyPlaced;
 
 public class DiggerAbilities implements Listener {
@@ -195,6 +191,7 @@ public class DiggerAbilities implements Listener {
         createTunnel(block);
     }
 
+    @SuppressWarnings("deprecation")
     private void createTunnel(Block block) {
         BlockFace face = getFacingBlockFace(player);
         boolean isY = face != null && block.getRelative(face.getOppositeFace()).isEmpty();
@@ -255,7 +252,7 @@ public class DiggerAbilities implements Listener {
     }
 
     private void spawnBlockBreakParticles(Block block) {
-        ParticleBuilder particle = new ParticleBuilder(Particle.BLOCK_CRACK);
+        ParticleBuilder particle = new ParticleBuilder(Particle.BLOCK_CRUMBLE);
         particle.data(block.getBlockData())
                 .location(block.getLocation())
                 .count(100)

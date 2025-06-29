@@ -171,7 +171,7 @@ public class MobNetAbilities implements Listener {
                 for (var item : overflow.values())
                     player.getWorld().dropItem(player.getLocation().add(0,1,0), item);
                 
-            ParticleBuilder particles = new ParticleBuilder(Particle.VILLAGER_HAPPY);
+            ParticleBuilder particles = new ParticleBuilder(Particle.HAPPY_VILLAGER);
             particles.count(100).location(mob.getLocation()).offset(1, 1, 1).spawn();
             player.playSound(player.getLocation(), "ui.toast.in", 1.0f, 1.0f);
 
@@ -324,7 +324,7 @@ public class MobNetAbilities implements Listener {
                     player.getInventory().setItemInMainHand(new ItemStack(Material.AIR));
                 }
 
-                ParticleBuilder particles = new ParticleBuilder(Particle.VILLAGER_HAPPY);
+                ParticleBuilder particles = new ParticleBuilder(Particle.HAPPY_VILLAGER);
                 particles.count(100).location(spawnLocation).offset(1, 1, 1).spawn();
                 player.playSound(player.getLocation(), "ui.toast.out", 1.0f, 1.0f);
 
