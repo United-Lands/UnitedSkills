@@ -102,6 +102,8 @@ public class Utils {
 
     public static boolean isInJob(Player player, String jobName) {
         JobsPlayer jobsPlayer = Jobs.getPlayerManager().getJobsPlayer(player);
+        if (jobsPlayer == null)
+            return false;
         for (JobProgression job : jobsPlayer.getJobProgression()) {
             if (job.getJob().getName().equals(jobName)) {
                 return true;
