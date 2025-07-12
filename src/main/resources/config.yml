@@ -3,6 +3,13 @@ masterwork-modifier:
   middle: 0.125
 pyrotechnic-modifier:
   blast-strength: 0.2
+exposure-therapy:
+  - HARMING
+  - SLOWNESS
+  - WEAKNESS
+  - POISON
+assisted-healing:
+  - HEALING
 brewing-items:
   - FERMENTED_SPIDER_EYE
   - RABBIT_FOOT
@@ -746,3 +753,5 @@ messages:
   entity-not-in-list-trafficker: "<red>This mob is not on the list of allowed mobs for the <yellow>Trafficker Skill<red>!"
   entity-not-in-list-wrangler: "<red>This mob is not on the list of allowed mobs for the <yellow>Wrangler Skill<red>!"
   no-catch-permission: "<red>You don't have permission to catch mobs in other people's towns without trust!"
+  exposure-therapy-success: "<yellow>Your exposure therapy skill has saved you from the negative effects of a potion!"
+  assisted-healing-success: "<green>Your assisted healing skill has granted you more health!"
