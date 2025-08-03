@@ -205,13 +205,7 @@ public class HunterAbilities implements Listener {
         Skill retriever = new Skill(player, SkillType.RETRIEVER);
         if (retriever.getLevel() != 0) {
             ItemStack bow = player.getInventory().getItemInMainHand();
-            if (bow.containsEnchantment(Enchantment.INFINITY)) {
-                if (!arrow.hasCustomEffects()) {
-                    if (retriever.isSuccessful()) {
-                        arrow.setMetadata("retrieved", new FixedMetadataValue(unitedSkills, true));
-                    }
-                }
-            } else {
+            if (!bow.containsEnchantment(Enchantment.INFINITY)) {
                 if (retriever.isSuccessful()) {
                     arrow.setMetadata("retrieved", new FixedMetadataValue(unitedSkills, true));
                 }
@@ -227,7 +221,8 @@ public class HunterAbilities implements Listener {
     @EventHandler
     public void onProjectileHit(ProjectileHitEvent event) {
 
-        // Only retrieve arrows that hit entities to avoid duplication by spam shooting blocks.
+        // Only retrieve arrows that hit entities to avoid duplication by spam shooting
+        // blocks.
         var hitEntity = event.getHitEntity();
         if (hitEntity != null && hitEntity instanceof LivingEntity) {
             Bukkit.getScheduler().runTask(unitedSkills, () -> {
@@ -236,6 +231,7 @@ public class HunterAbilities implements Listener {
                     if (arrow.getShooter() instanceof Player shooter) {
                         Skill retriever = new Skill(player, SkillType.RETRIEVER);
                         retriever.sendActivationActionBar();
+                        arrow.removeMetadata("retrieved", unitedSkills);
                         shooter.getInventory().addItem(arrow.getItemStack().asOne());
                     }
                     event.getEntity().remove();
