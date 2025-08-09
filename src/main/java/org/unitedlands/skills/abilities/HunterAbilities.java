@@ -2,6 +2,8 @@ package org.unitedlands.skills.abilities;
 
 import com.destroystokyo.paper.ParticleBuilder;
 import dev.lone.itemsadder.api.CustomStack;
+import io.lumine.mythic.core.skills.projectiles.Projectile;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -35,6 +37,8 @@ import org.unitedlands.skills.skill.SkillType;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.unitedlands.skills.Utils.canActivate;
@@ -45,7 +49,9 @@ public class HunterAbilities implements Listener {
     private final HashMap<UUID, Long> durations = new HashMap<>();
     private final Collection<LivingEntity> bleedingEntities = new ArrayList<>();
     private final HashMap<LivingEntity, Long> bleedingDurations = new HashMap<>();
-    private Player player;
+
+    private Set<UUID> retrieverArrows = new HashSet<>();
+    private Set<UUID> piercingArrows = new HashSet<>();
 
     public HunterAbilities(UnitedSkills unitedSkills) {
         this.unitedSkills = unitedSkills;
@@ -59,8 +65,8 @@ public class HunterAbilities implements Listener {
         if (entity.getKiller() == null) {
             return;
         }
-        player = entity.getKiller();
-        if (!isHunter()) {
+        var player = entity.getKiller();
+        if (!isHunter(player)) {
             return;
         }
         if (isSpawnerMob(entity)) {
@@ -88,8 +94,8 @@ public class HunterAbilities implements Listener {
         if (!(event.getEntity() instanceof Player)) {
             return;
         }
-        player = (Player) event.getEntity();
-        if (!isHunter()) {
+        var player = (Player) event.getEntity();
+        if (!isHunter(player)) {
             return;
         }
         Skill counterAttack = new Skill(player, SkillType.COUNTER_ATTACK);
@@ -125,8 +131,8 @@ public class HunterAbilities implements Listener {
         if (event.getEntity() instanceof Player) {
             return;
         }
-        player = (Player) event.getDamager();
-        if (!isHunter()) {
+        var player = (Player) event.getDamager();
+        if (!isHunter(player)) {
             return;
         }
         ActiveSkill precisionStrike = new ActiveSkill(player, SkillType.PRECISION_STRIKE, cooldowns, durations);
@@ -167,8 +173,8 @@ public class HunterAbilities implements Listener {
 
     @EventHandler
     public void onPrecisionStrikeActivate(PlayerInteractEvent event) {
-        player = event.getPlayer();
-        if (!isHunter()) {
+        var player = event.getPlayer();
+        if (!isHunter(player)) {
             return;
         }
         ActiveSkill precisionStrike = new ActiveSkill(player, SkillType.PRECISION_STRIKE, cooldowns, durations);
@@ -180,8 +186,8 @@ public class HunterAbilities implements Listener {
 
     @EventHandler
     public void onFocusActivate(PlayerInteractEvent event) {
-        player = event.getPlayer();
-        if (!isHunter()) {
+        var player = event.getPlayer();
+        if (!isHunter(player)) {
             return;
         }
         ActiveSkill focus = new ActiveSkill(player, SkillType.FOCUS, cooldowns, durations);
@@ -195,8 +201,8 @@ public class HunterAbilities implements Listener {
         if (!(event.getEntity().getShooter() instanceof Player shooter)) {
             return;
         }
-        player = shooter;
-        if (!isHunter()) {
+        var player = shooter;
+        if (!isHunter(player)) {
             return;
         }
         if (!(event.getEntity() instanceof Arrow arrow)) {
@@ -207,13 +213,13 @@ public class HunterAbilities implements Listener {
             ItemStack bow = player.getInventory().getItemInMainHand();
             if (!bow.containsEnchantment(Enchantment.INFINITY)) {
                 if (retriever.isSuccessful()) {
-                    arrow.setMetadata("retrieved", new FixedMetadataValue(unitedSkills, true));
+                    retrieverArrows.add(arrow.getUniqueId());
                 }
             }
         }
         Skill piercing = new Skill(player, SkillType.PIERCING);
         if (piercing.isSuccessful()) {
-            arrow.setMetadata("piercing", new FixedMetadataValue(unitedSkills, true));
+            piercingArrows.add(arrow.getUniqueId());
             spawnArrowTrail(arrow, Material.RED_WOOL);
         }
     }
@@ -221,42 +227,53 @@ public class HunterAbilities implements Listener {
     @EventHandler
     public void onProjectileHit(ProjectileHitEvent event) {
 
-        // Only retrieve arrows that hit entities to avoid duplication by spam shooting
-        // blocks.
-        var hitEntity = event.getHitEntity();
-        if (hitEntity != null && hitEntity instanceof LivingEntity) {
-            Bukkit.getScheduler().runTask(unitedSkills, () -> {
-                if (event.getEntity().hasMetadata("retrieved")) {
-                    Arrow arrow = (Arrow) event.getEntity();
-                    if (arrow.getShooter() instanceof Player shooter) {
-                        Skill retriever = new Skill(player, SkillType.RETRIEVER);
-                        retriever.sendActivationActionBar();
-                        arrow.removeMetadata("retrieved", unitedSkills);
-                        shooter.getInventory().addItem(arrow.getItemStack().asOne());
-                    }
-                    event.getEntity().remove();
-                }
-            });
-        }
-
-        if (!(event.getEntity().getShooter() instanceof Player shooter)) {
+        // Only process arrows
+        if (!(event.getEntity() instanceof Arrow arrow))
             return;
+
+        Bukkit.getScheduler().runTaskLater(unitedSkills, () -> {
+            removeArrowFromCache(event.getEntity().getUniqueId());
+        }, 1L);
+
+        // Only process arrows that hit entities
+        var hitEntity = event.getHitEntity();
+        if (hitEntity == null || !(hitEntity instanceof LivingEntity))
+            return;
+
+        // Only process player projectiles
+        if (!(event.getEntity().getShooter() instanceof Player shooter))
+            return;
+
+        if (!isHunter(shooter))
+            return;
+
+        var arrowId = arrow.getUniqueId();
+
+        // Retriever skill
+
+        if (retrieverArrows.contains(arrowId)) {
+
+            Skill retriever = new Skill(shooter, SkillType.RETRIEVER);
+            retriever.sendActivationActionBar();
+
+            shooter.getInventory().addItem(arrow.getItemStack().asOne());
+            arrow.remove();
         }
+        
+        // Piercing & critical hit skill
+
+        // Shouldn't work when hitting players
         if (event.getHitEntity() instanceof Player) {
             return;
         }
+
+        // Shouldn't work when hitting blocks
         if (event.getHitBlock() != null) {
             return;
         }
-        player = shooter;
-        if (!isHunter()) {
-            return;
-        }
-        if (!(event.getEntity() instanceof Arrow arrow)) {
-            return;
-        }
-        Skill piercing = new Skill(player, SkillType.PIERCING);
-        if (arrow.hasMetadata("piercing")) {
+
+        Skill piercing = new Skill(shooter, SkillType.PIERCING);
+        if (piercingArrows.contains(arrowId)) {
             piercing.sendActivationActionBar();
             int modifier = 1;
             if (piercing.getLevel() == 3) {
@@ -264,12 +281,18 @@ public class HunterAbilities implements Listener {
             }
             arrow.setPierceLevel(arrow.getPierceLevel() + modifier);
         }
-        Skill criticalHit = new Skill(player, SkillType.CRITICAL_HIT);
+        Skill criticalHit = new Skill(shooter, SkillType.CRITICAL_HIT);
         if (criticalHit.isSuccessful()) {
             criticalHit.sendActivationSound();
             spawnBleedingParticles(event.getEntity(), 100);
             arrow.setDamage(arrow.getDamage() * 2);
         }
+
+    }
+
+    private void removeArrowFromCache(UUID id) {
+        retrieverArrows.remove(id);
+        piercingArrows.remove(id);
     }
 
     @EventHandler
@@ -277,8 +300,8 @@ public class HunterAbilities implements Listener {
         if (!(event.getDamager() instanceof Player damager)) {
             return;
         }
-        player = damager;
-        if (!isHunter()) {
+        var player = damager;
+        if (!isHunter(player)) {
             return;
         }
         Entity entity = event.getEntity();
@@ -314,8 +337,8 @@ public class HunterAbilities implements Listener {
         if (!(event.getEntity() instanceof Player)) {
             return;
         }
-        player = (Player) event.getEntity();
-        if (!isHunter()) {
+        var player = (Player) event.getEntity();
+        if (!isHunter(player)) {
             return;
         }
         ActiveSkill focus = new ActiveSkill(player, SkillType.FOCUS, cooldowns, durations);
@@ -362,7 +385,7 @@ public class HunterAbilities implements Listener {
         return entity.hasMetadata("spawner-mob");
     }
 
-    private boolean isHunter() {
+    private boolean isHunter(Player player) {
         return Utils.isInJob(player, "Hunter");
     }
 }
