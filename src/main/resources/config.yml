@@ -849,7 +849,7 @@ permissions:
       - jobs.woodcutter.level.15
       - ia.user.recipe.carpenter.2
     20:
-      - jobs.woodcutter.level.2
+      - jobs.woodcutter.level.20
       - ia.user.recipe.carpenter.3
     25:
       - jobs.woodcutter.level.25
