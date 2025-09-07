@@ -6,7 +6,7 @@
 
     <groupId>org.unitedlands</groupId>
     <artifactId>UnitedSkills</artifactId>
-    <version>3.7.4</version>
+    <version>3.8-SNAPSHOT1</version>
     <packaging>jar</packaging>
 
     <name>UnitedSkills</name>
@@ -109,8 +109,8 @@
             <version>1.4.7.4</version>
         </dependency>
         <dependency>
-            <groupId>com.craftaro.ultimatetimber</groupId>
-            <artifactId>ultimate-timber</artifactId>
+            <groupId>com.songoda</groupId>
+            <artifactId>ultimatetimber</artifactId>
             <version>4.2.0</version>
             <scope>provided</scope>
         </dependency>

@@ -744,6 +744,123 @@ frenzy-whitelist:
   - EMERALD
   - COBBLESTONE
   - COBBLED_DEEPSLATE
+
+###################################################
+# +---------------------------------------------+ #
+# |            Level-up Permissions             | #
+# +---------------------------------------------+ #
+###################################################
+
+# Manages permission nodes players get upon levelling up certain jobs.
+
+permissions:
+
+  brewer:
+    5:
+      - jobs.brewer.level.5
+    10:
+      - jobs.brewer.level.10
+      - ia.user.recipe.brewerpotions.1
+    15:
+      - jobs.brewer.level.15
+      - ia.user.recipe.brewerpotions.2
+    20:
+      - jobs.brewer.level.20
+      - ia.user.recipe.brewerpotions.3
+    25:
+      - jobs.brewer.level.25
+      - ia.user.recipe.oil-extractor
+
+  digger:
+    5:
+      - jobs.digger.level.5
+    10:
+      - jobs.digger.level.10
+      - ia.user.recipe.compactor.1
+    15:
+      - jobs.digger.level.15
+      - ia.user.recipe.compactor.2
+    20:
+      - jobs.digger.level.20
+      - ia.user.recipe.compactor.3
+    25:
+      - jobs.digger.level.25
+
+  farmer:
+    5:
+      - jobs.farmer.level.5
+    10:
+      - jobs.farmer.level.10
+    15:
+      - jobs.farmer.level.15
+    20:
+      - jobs.farmer.level.20
+      - ia.user.recipe.wrangler
+    25:
+      - jobs.farmer.level.25
+      - ia.user.recipe.ancient-oak
+      - united.skills.ancient-oak.1
+
+  fisherman:
+    5:
+      - jobs.fisherman.level.5
+    10:
+      - jobs.fisherman.level.10
+    15:
+      - jobs.fisherman.level.15
+    20:
+      - jobs.fisherman.level.20
+    25:
+      - jobs.fisherman.level.25
+
+  hunter:
+    5:
+      - jobs.hunter.level.5
+    10:
+      - jobs.hunter.level.10
+    15:
+      - jobs.hunter.level.15
+    20:
+      - jobs.hunter.level.20
+      - ia.user.recipe.poacher
+    25:
+      - jobs.hunter.level.25
+
+  miner:
+    5:
+      - jobs.miner.level.5
+    10:
+      - jobs.miner.level.10
+    15:
+      - jobs.miner.level.15
+    20:
+      - jobs.miner.level.20
+    25:
+      - jobs.miner.level.25
+      - ia.user.recipe.armoursmith
+
+  woodcutter:
+    5:
+      - jobs.woodcutter.level.5
+    10:
+      - jobs.woodcutter.level.10
+      - ia.user.recipe.carpenter.1
+    15:
+      - jobs.woodcutter.level.15
+      - ia.user.recipe.carpenter.2
+    20:
+      - jobs.woodcutter.level.2
+      - ia.user.recipe.carpenter.3
+    25:
+      - jobs.woodcutter.level.25
+      - ia.user.expert-whittler
+
+###################################################
+# +---------------------------------------------+ #
+# |                   Messages                  | #
+# +---------------------------------------------+ #
+###################################################
+
 messages:
   no-permission: "You do not have permission to execute this command!"
   must-be-hunter: "<red>You must be a hunter to use this mob net!"
