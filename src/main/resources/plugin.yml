@@ -1,13 +1,15 @@
 name: UnitedSkills
 version: '${project.version}'
 main: org.unitedlands.skills.UnitedSkills
-api-version: 1.18
+api-version: 1.21
 depend:
   - Jobs
   - Towny
   - UltimateTimber
   - ItemsAdder
+  - LuckPerms
 authors: [ Maroon28 ]
+contributors: [ Litning11, Theriel_ ]
 description: A plugin built to manage job skills for UnitedLands
 website: unitedlands.org
 commands:
