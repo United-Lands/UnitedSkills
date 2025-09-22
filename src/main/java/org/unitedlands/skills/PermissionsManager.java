@@ -4,6 +4,7 @@ import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.types.PermissionNode;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
@@ -31,16 +32,35 @@ public final class PermissionsManager {
         grant(player, nodes);
     }
 
+    public void applyCumulative(Player player, String jobName, int currentLevel) {
+        String key = jobName.toLowerCase(Locale.ROOT);
+        NavigableMap<Integer, List<String>> levels = table.get(key);
+        if (levels == null) return;
+
+        List<String> toGrant = new ArrayList<>();
+        for (Map.Entry<Integer, List<String>> e : levels.entrySet()) {
+            if (e.getKey() <= currentLevel) {
+                toGrant.addAll(e.getValue());
+            }
+        }
+        if (toGrant.isEmpty()) return;
+
+        grant(player, toGrant); // logging happens only if nodes were added
+    }
+
+
     // Grant the correct permission to the player.
     private void grant(Player player, Collection<String> nodes) {
-        // This helper will load, edit, and save the user's perms asynchronously.
         luckPerms.getUserManager().modifyUser(player.getUniqueId(), (User user) -> {
+            boolean changed = false;
             for (String n : nodes) {
-                user.data().add(PermissionNode.builder(n).value(true).build());
+                if (user.data().add(PermissionNode.builder(n).value(true).build()).wasSuccessful()) {
+                    changed = true;
+                }
             }
-            player.getServer().getLogger().info(
-                    "[UnitedSkills] Granted " + nodes + " to " + player.getName()
-            );
+            if (changed) {
+                Bukkit.getLogger().info("[UnitedSkills] Granted " + nodes + " to " + player.getName());
+            }
         });
     }
 

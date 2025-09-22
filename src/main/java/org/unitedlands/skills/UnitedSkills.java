@@ -8,6 +8,7 @@ import org.unitedlands.skills.abilities.*;
 import org.unitedlands.skills.commands.PointsCommand;
 import org.unitedlands.skills.commands.UnitedSkillsCommand;
 import org.unitedlands.skills.events.JobLevelUpEvent;
+import org.unitedlands.skills.events.PlayerJoinServerEvent;
 import org.unitedlands.skills.hooks.UnitedSkillsPlaceholders;
 import org.unitedlands.skills.points.JobsListener;
 import org.unitedlands.skills.skill.SkillFile;
@@ -48,7 +49,8 @@ public final class UnitedSkills extends JavaPlugin {
                 new MinerAbilities(this),
                 new MasterworkListener(this),
                 new MobNetAbilities(this),
-                new JobLevelUpEvent(this.permissions)
+                new JobLevelUpEvent(this.permissions),
+                new PlayerJoinServerEvent(this.permissions)
         };
 
         registerEvents(listeners);

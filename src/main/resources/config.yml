@@ -853,7 +853,7 @@ permissions:
       - ia.user.recipe.carpenter.3
     25:
       - jobs.woodcutter.level.25
-      - ia.user.expert-whittler
+      - ia.user.recipe.expert-whittler
 
 ###################################################
 # +---------------------------------------------+ #
