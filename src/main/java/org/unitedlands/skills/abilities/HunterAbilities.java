@@ -2,7 +2,6 @@ package org.unitedlands.skills.abilities;
 
 import com.destroystokyo.paper.ParticleBuilder;
 import dev.lone.itemsadder.api.CustomStack;
-import io.lumine.mythic.core.skills.projectiles.Projectile;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
