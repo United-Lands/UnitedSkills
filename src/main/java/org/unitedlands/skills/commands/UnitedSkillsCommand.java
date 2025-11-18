@@ -1,32 +1,19 @@
 package org.unitedlands.skills.commands;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.jetbrains.annotations.NotNull;
+import org.unitedlands.classes.BaseCommandExecutor;
+import org.unitedlands.interfaces.IMessageProvider;
 import org.unitedlands.skills.UnitedSkills;
-import org.unitedlands.skills.skill.SkillFile;
+import org.unitedlands.skills.commands.handlers.ReloadHandler;
 
-public class UnitedSkillsCommand implements CommandExecutor {
+public class UnitedSkillsCommand extends BaseCommandExecutor<UnitedSkills> {
 
-    private final UnitedSkills unitedSkills;
-
-    public UnitedSkillsCommand(UnitedSkills unitedSkills) {
-        this.unitedSkills = unitedSkills;
+    public UnitedSkillsCommand(UnitedSkills plugin, IMessageProvider messageProvider) {
+        super(plugin, messageProvider);
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (sender.hasPermission("united.skills.admin")) {
-            if (args[0].equals("reload")) {
-                unitedSkills.reloadConfig();
-                SkillFile skillFile = new SkillFile(unitedSkills);
-                skillFile.reloadConfig();
-                sender.sendMessage(Component.text("Configuration reloaded!", NamedTextColor.GREEN));
-            }
-        }
-        return false;
+    protected void registerHandlers() {
+        handlers.put("reload", new ReloadHandler(plugin, messageProvider));
     }
+
 }

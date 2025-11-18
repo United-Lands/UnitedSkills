@@ -24,10 +24,12 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.potion.PotionType;
 import org.jetbrains.annotations.NotNull;
+import org.unitedlands.skills.MessageProvider;
 import org.unitedlands.skills.UnitedSkills;
 import org.unitedlands.skills.Utils;
 import org.unitedlands.skills.skill.Skill;
 import org.unitedlands.skills.skill.SkillType;
+import org.unitedlands.utils.Messenger;
 
 import java.util.List;
 import java.util.Objects;
@@ -37,9 +39,11 @@ import static org.unitedlands.skills.Utils.*;
 
 public class BrewerAbilities implements Listener {
     private final UnitedSkills plugin;
+    private final MessageProvider messageProvider;
 
-    public BrewerAbilities(UnitedSkills unitedSkills) {
+    public BrewerAbilities(UnitedSkills unitedSkills, MessageProvider messageProvider) {
         this.plugin = unitedSkills;
+        this.messageProvider = messageProvider;
     }
 
     @EventHandler
@@ -199,7 +203,8 @@ public class BrewerAbilities implements Listener {
 
             Skill exposureTherapy = new Skill(player, SkillType.EXPOSURE_THERAPY);
             if (exposureTherapy.isSuccessful()) {
-                player.sendMessage(Utils.getMessage("exposure-therapy-success"));
+                Messenger.sendMessage(player, messageProvider.get("messages.exposure-therapy-success"), null,
+                        messageProvider.get("messages.prefix"));
                 player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 2f, 1f);
                 if (!player.getGameMode().equals(GameMode.CREATIVE)) {
                     player.getInventory().remove(item);
@@ -242,7 +247,8 @@ public class BrewerAbilities implements Listener {
 
                 Skill exposureTherapy = new Skill(target, SkillType.EXPOSURE_THERAPY);
                 if (exposureTherapy.isSuccessful()) {
-                    target.sendMessage(Utils.getMessage("exposure-therapy-success"));
+                    Messenger.sendMessage(target, messageProvider.get("messages.exposure-therapy-success"), null,
+                            messageProvider.get("messages.prefix"));
                     target.playSound(target.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 2f, 1f);
                     event.setIntensity(target, 0);
                 }
@@ -280,7 +286,8 @@ public class BrewerAbilities implements Listener {
         } else {
             target.setHealth(Math.min(20, health + healthModifier * skillLevel * 2));
         }
-        target.sendMessage(Utils.getMessage("assisted-healing-success"));
+        Messenger.sendMessage(target, messageProvider.get("messages.assisted-healing-success"), null,
+                messageProvider.get("messages.prefix"));
     }
 
     private boolean isExposureTherapyPotion(PotionMeta potionMeta) {

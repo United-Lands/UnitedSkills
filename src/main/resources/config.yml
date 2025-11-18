@@ -862,6 +862,12 @@ permissions:
 ###################################################
 
 messages:
+  reload: "<green>Config reloaded</green>"
+  points-usage: "Usage: /points <add | remove> <player> <job> <amount>"
+  points-error-player-not-found: "<red>Player not found."
+  points-error-invalid-number: "<red>Invalid number format."
+  points-added: "<dark_green>Added <yellow>{amount}</yellow> points to <yellow>{player-name}<yellow> in job <yellow>{job-name}</yellow></dark_green>"
+  points-removed: "<dark_red>Removed <yellow>{amount}</yellow> points to <yellow>{player-name}<yellow> in job <yellow>{job-name}</yellow></dark_red>"
   no-permission: "You do not have permission to execute this command!"
   must-be-hunter: "<red>You must be a hunter to use this mob net!"
   must-be-farmer: "<red>You must be a farmer to use this mob net!"
