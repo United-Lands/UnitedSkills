@@ -19,7 +19,7 @@ import java.util.*;
 public class LootTable {
     private final String name;
     private final Skill requiredSkill;
-    private final UnitedSkills unitedSkills = Utils.getUnitedSkills();
+    private final UnitedSkills unitedSkills = UnitedSkills.getInstance();
     private final MiniMessage miniMessage = MiniMessage.miniMessage();
 
     public LootTable(String name, Skill requiredSkill) {

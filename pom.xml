@@ -6,7 +6,7 @@
 
     <groupId>org.unitedlands</groupId>
     <artifactId>UnitedSkills</artifactId>
-    <version>3.8.2</version>
+    <version>3.10.0</version>
     <packaging>jar</packaging>
 
     <name>UnitedSkills</name>
@@ -94,6 +94,10 @@
             <id>glaremasters repo</id>
             <url>https://repo.glaremasters.me/repository/towny/</url>
         </repository>
+        <repository>
+            <id>matteodev</id>
+            <url>https://maven.devs.beer/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -112,7 +116,7 @@
         <dependency>
             <groupId>com.github.Zrips</groupId>
             <artifactId>CMILib</artifactId>
-            <version>1.4.7.4</version>
+            <version>1.5.7.0</version>
         </dependency>
         <dependency>
             <groupId>com.songoda</groupId>
@@ -127,14 +131,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>dev.triumphteam</groupId>
-            <artifactId>triumph-gui</artifactId>
-            <version>3.1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.LoneDev6</groupId>
+            <groupId>dev.lone</groupId>
             <artifactId>api-itemsadder</artifactId>
-            <version>3.0.0</version>
+            <version>4.0.10</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -143,7 +142,12 @@
             <version>2.10.9</version>
             <scope>provided</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.unitedlands</groupId>
+            <artifactId>UnitedLib</artifactId>
+            <version>1.0</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>io.lumine</groupId>
             <artifactId>Mythic-Dist</artifactId>

@@ -3,33 +3,22 @@ package org.unitedlands.skills;
 import com.gamingmesh.jobs.Jobs;
 import com.gamingmesh.jobs.container.JobProgression;
 import com.gamingmesh.jobs.container.JobsPlayer;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.unitedlands.skills.points.PlayerConfiguration;
 import org.unitedlands.skills.skill.ActiveSkill;
 
-import java.util.Objects;
 
 public class Utils {
-    private static final MiniMessage miniMessage = MiniMessage.miniMessage();
-
-    @NotNull
-    public static Component getMessage(String message) {
-        String configMessage = getUnitedSkills().getConfig().getString("messages." + message);
-        return miniMessage.deserialize(Objects.requireNonNullElseGet(configMessage,
-                () -> "<red>Message <yellow>" + message + "<red> could not be found in the config file!"));
-    }
-
-    public static UnitedSkills getUnitedSkills() {
-        return (UnitedSkills) Bukkit.getPluginManager().getPlugin("UnitedSkills");
-    }
 
     public static void multiplyItem(Player player, ItemStack item, int multiplier) {
         for (int i = 0; i < multiplier; i++) {
@@ -110,6 +99,18 @@ public class Utils {
             }
         }
         return false;
+    }
+
+    @NotNull
+    public static PlayerConfiguration getPlayerConfiguration(OfflinePlayer player) {
+        return new PlayerConfiguration(UnitedSkills.getInstance(), player);
+    }
+
+    public static PlayerConfiguration getPlayerConfiguration(CommandSender sender) {
+        if (sender instanceof Player player) {
+            return new PlayerConfiguration(UnitedSkills.getInstance(), player);
+        }
+        return null;
     }
 
     public static Jobs getJobs() {

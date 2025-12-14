@@ -22,10 +22,12 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+import org.unitedlands.skills.MessageProvider;
 import org.unitedlands.skills.UnitedSkills;
 import org.unitedlands.skills.Utils;
 import org.unitedlands.skills.skill.Skill;
 import org.unitedlands.skills.skill.SkillType;
+import org.unitedlands.utils.Messenger;
 
 import dev.lone.itemsadder.api.CustomStack;
 import net.kyori.adventure.text.Component;
@@ -39,10 +41,12 @@ import de.tr7zw.nbtapi.NBT;
 public class MobNetAbilities implements Listener {
 
     private final UnitedSkills unitedSkills;
+    private final MessageProvider messageProvider;
     private Player player;
 
-    public MobNetAbilities(UnitedSkills unitedSkills) {
+    public MobNetAbilities(UnitedSkills unitedSkills, MessageProvider messageProvider) {
         this.unitedSkills = unitedSkills;
+        this.messageProvider = messageProvider;
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
@@ -88,11 +92,13 @@ public class MobNetAbilities implements Listener {
             return;
 
         if (isHostileMobNet && !isHunter()) {
-            player.sendMessage(Utils.getMessage("must-be-hunter"));
+            Messenger.sendMessage(player, messageProvider.get("messages.must-be-hunter"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
         if (isPassiveMobNet && !isFarmer()) {
-            player.sendMessage(Utils.getMessage("must-be-farmer"));
+            Messenger.sendMessage(player, messageProvider.get("messages.must-be-farmer"), null,
+                    messageProvider.get("messages.prefix"));
             return;
         }
 
@@ -113,7 +119,8 @@ public class MobNetAbilities implements Listener {
                         if (!resident.hasTown() || (resident.hasTown() && !resident.getTownOrNull().equals(town))) {
                             var trustList = town.getTrustedResidents();
                             if (!trustList.contains(resident)) {
-                                player.sendMessage(Utils.getMessage("no-catch-permission-town"));
+                                Messenger.sendMessage(player, messageProvider.get("messages.no-catch-permission-town"),
+                                        null, messageProvider.get("messages.prefix"));
                                 return;
                             }
                         }
@@ -125,12 +132,14 @@ public class MobNetAbilities implements Listener {
         if (isHostileMobNet && isHunter()) {
             Skill trafficker = new Skill(player, SkillType.TRAFFICKER);
             if (trafficker.getLevel() == 0) {
-                player.sendMessage(Utils.getMessage("must-have-trafficker"));
+                Messenger.sendMessage(player, messageProvider.get("messages.must-have-trafficker"), null,
+                        messageProvider.get("messages.prefix"));
                 return;
             }
 
             if (!isInEntityList(mob, "trafficker-mobs")) {
-                player.sendMessage(Utils.getMessage("entity-not-in-list-trafficker"));
+                Messenger.sendMessage(player, messageProvider.get("messages.entity-not-in-list-trafficker"), null,
+                        messageProvider.get("messages.prefix"));
                 return;
             } else {
                 event.setCancelled(true);
@@ -142,12 +151,14 @@ public class MobNetAbilities implements Listener {
         if (isPassiveMobNet && isFarmer()) {
             Skill wrangler = new Skill(player, SkillType.WRANGLER);
             if (wrangler.getLevel() == 0) {
-                player.sendMessage(Utils.getMessage("must-have-wrangler"));
+                Messenger.sendMessage(player, messageProvider.get("messages.must-have-wrangler"), null,
+                        messageProvider.get("messages.prefix"));
                 return;
             }
 
             if (!isInEntityList(mob, "wrangler-mobs")) {
-                player.sendMessage(Utils.getMessage("entity-not-in-list-wrangler"));
+                Messenger.sendMessage(player, messageProvider.get("messages.entity-not-in-list-wrangler"), null,
+                        messageProvider.get("messages.prefix"));
                 return;
             } else {
                 event.setCancelled(true);
@@ -169,8 +180,8 @@ public class MobNetAbilities implements Listener {
             var overflow = player.getInventory().addItem(fullMobNet);
             if (overflow != null && !overflow.isEmpty())
                 for (var item : overflow.values())
-                    player.getWorld().dropItem(player.getLocation().add(0,1,0), item);
-                
+                    player.getWorld().dropItem(player.getLocation().add(0, 1, 0), item);
+
             ParticleBuilder particles = new ParticleBuilder(Particle.HAPPY_VILLAGER);
             particles.count(100).location(mob.getLocation()).offset(1, 1, 1).spawn();
             player.playSound(player.getLocation(), "ui.toast.in", 1.0f, 1.0f);
@@ -285,7 +296,7 @@ public class MobNetAbilities implements Listener {
                 long catchTime = NBT.get(itemInHand, nbt -> (long) nbt.getLong("ulc_catchtime"));
                 if (System.currentTimeMillis() - catchTime <= 500)
                     return;
-                
+
                 var spawnLocation = spawnBlockLocation.add(0.5, 0.5, 0.5);
                 var newMob = player.getWorld().spawnEntity(spawnLocation, EntityType.valueOf(capturedMobType));
 
