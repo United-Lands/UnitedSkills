@@ -58,7 +58,8 @@ public class LootTable {
             assert itemSection != null;
             @NotNull
             List<String> itemBiomes = itemSection.getStringList("biomes");
-            if (!itemBiomes.contains(biome.toString())) {
+            var biomeName = biome.key().asMinimalString().toUpperCase();
+            if (!itemBiomes.contains(biomeName)) {
                 continue;
             }
             if (isSuccessful(itemSection)) {
@@ -109,10 +110,11 @@ public class LootTable {
 
         if (ia == null) {
             // Generate a default ItemStack
-            
-            Material itemMaterial; 
 
-            // If there is a list of random materials, pick one of them. If not, assert that there is just one material present.
+            Material itemMaterial;
+
+            // If there is a list of random materials, pick one of them. If not, assert that
+            // there is just one material present.
             if (!itemSection.getStringList("materials").isEmpty()) {
                 itemMaterial = getRandomMaterial(itemSection);
             } else {
