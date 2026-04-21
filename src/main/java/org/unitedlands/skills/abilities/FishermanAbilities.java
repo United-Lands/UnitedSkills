@@ -16,6 +16,7 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerFishEvent;
@@ -47,7 +48,7 @@ public class FishermanAbilities implements Listener {
         this.unitedSkills = unitedSkills;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onRareCatchFish(PlayerFishEvent event) {
     
         var player = event.getPlayer();
@@ -65,7 +66,7 @@ public class FishermanAbilities implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     public void onTreasureHunterFish(PlayerFishEvent event) {
         var player = event.getPlayer();
         if (!isFisherman(player)) {
@@ -117,7 +118,7 @@ public class FishermanAbilities implements Listener {
         player.setVelocity(player.getLocation().getDirection().multiply(0.2 * level));
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     public void onAnglerFish(PlayerFishEvent event) {
         var player = event.getPlayer();
         if (!isFisherman(player)) {
@@ -141,7 +142,7 @@ public class FishermanAbilities implements Listener {
         }, 20);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     public void onGrappleActivate(PlayerInteractEvent event) {
         var player = event.getPlayer();
         if (!isFisherman(player)) {
@@ -154,7 +155,7 @@ public class FishermanAbilities implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     public void onGrapple(PlayerFishEvent event) {
         var player = event.getPlayer();
         if (!isFisherman(player)) {
@@ -222,7 +223,7 @@ public class FishermanAbilities implements Listener {
 
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     public void onHookedUse(PlayerFishEvent event) {
         var player = event.getPlayer();
         if (!isFisherman(player)) {

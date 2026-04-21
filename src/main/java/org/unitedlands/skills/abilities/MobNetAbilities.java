@@ -22,14 +22,15 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+import org.unitedlands.UnitedLib;
 import org.unitedlands.skills.MessageProvider;
 import org.unitedlands.skills.UnitedSkills;
 import org.unitedlands.skills.Utils;
 import org.unitedlands.skills.skill.Skill;
 import org.unitedlands.skills.skill.SkillType;
+import org.unitedlands.utils.Logger;
 import org.unitedlands.utils.Messenger;
 
-import dev.lone.itemsadder.api.CustomStack;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
@@ -77,16 +78,20 @@ public class MobNetAbilities implements Listener {
         if (itemInHand == null)
             return;
 
-        // Check to see if the item is a custom ItemsAdder item.
-        var captureItem = CustomStack.byItemStack(itemInHand);
-        if (captureItem == null)
+        // Check to see if the item is a custom item.
+
+        var itemFactory = UnitedLib.getInstance().getItemFactory();
+
+        if (!itemFactory.isCustomItem(itemInHand))
             return;
 
+        var hostileMobNet = itemFactory.getItemStack("empty_hostile_mob_net", 1);
+        var passiveMobNet = itemFactory.getItemStack("empty_passive_mob_net", 1);
+
         // Check for the correct items
-        var isHostileMobNet = captureItem
-                .matchNamespacedID(CustomStack.getInstance("unitedlands:empty_hostile_mob_net"));
-        var isPassiveMobNet = captureItem
-                .matchNamespacedID(CustomStack.getInstance("unitedlands:empty_passive_mob_net"));
+
+        var isHostileMobNet = itemFactory.isItem(itemInHand, hostileMobNet);
+        var isPassiveMobNet = itemFactory.isItem(itemInHand, passiveMobNet);
 
         if (!isHostileMobNet && !isPassiveMobNet)
             return;
@@ -197,8 +202,8 @@ public class MobNetAbilities implements Listener {
 
     private ItemStack createFullMobNet(LivingEntity mob, String type) {
 
-        ItemStack fullCaptureItem = CustomStack.getInstance("unitedlands:full_" + type + "_mob_net").getItemStack();
-        fullCaptureItem.setAmount(1);
+        ItemStack fullCaptureItem = UnitedLib.getInstance().getItemFactory()
+                .getItemStack("full_" + type + "_mob_net", 1);
 
         String customName = NBT.get(mob, nbt -> (String) nbt.getString("CustomName"));
         Integer age = NBT.get(mob, nbt -> (Integer) nbt.getInteger("Age"));
@@ -260,17 +265,23 @@ public class MobNetAbilities implements Listener {
 
             player = event.getPlayer();
             var itemInHand = player.getInventory().getItemInMainHand();
-
-            // Check to see if the item is a custom ItemsAdder item.
-            var captureItem = CustomStack.byItemStack(itemInHand);
-            if (captureItem == null)
+            if (itemInHand == null)
                 return;
 
+            // Check to see if the item is a custom item.
+
+            var itemFactory = UnitedLib.getInstance().getItemFactory();
+
+            if (!itemFactory.isCustomItem(itemInHand))
+                return;
+
+            var hostileMobNet = itemFactory.getItemStack("full_hostile_mob_net", 1);
+            var passiveMobNet = itemFactory.getItemStack("full_passive_mob_net", 1);
+
             // Check for the correct items
-            var isHostileMobNet = captureItem
-                    .matchNamespacedID(CustomStack.getInstance("unitedlands:full_hostile_mob_net"));
-            var isPassiveMobNet = captureItem
-                    .matchNamespacedID(CustomStack.getInstance("unitedlands:full_passive_mob_net"));
+
+            var isHostileMobNet = itemFactory.isItem(itemInHand, hostileMobNet);
+            var isPassiveMobNet = itemFactory.isItem(itemInHand, passiveMobNet);
 
             if (!isHostileMobNet && !isPassiveMobNet)
                 return;

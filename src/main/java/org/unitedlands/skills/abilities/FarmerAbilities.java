@@ -4,8 +4,6 @@ import com.destroystokyo.paper.ParticleBuilder;
 import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.object.Resident;
 import com.palmergames.bukkit.towny.object.Town;
-import dev.lone.itemsadder.api.CustomCrop;
-import dev.lone.itemsadder.api.CustomStack;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -70,42 +68,58 @@ public class FarmerAbilities implements Listener {
 
     @EventHandler
     public void onCropPlant(BlockPlaceEvent event) {
-        player = event.getPlayer();
-        if (isFarmer()) {
-            return;
-        }
-        Skill fertiliser = new Skill(player, SkillType.FERTILISER);
-        if (fertiliser.getLevel() == 0) {
-            return;
-        }
-        Block block = event.getBlock();
-        if (isCrop(block.getType())) {
-            return;
-        }
-        Ageable crop = (Ageable) block.getBlockData();
-        CustomStack customStack = CustomStack.byItemStack(event.getItemInHand());
+        // player = event.getPlayer();
+        // if (isFarmer()) {
+        //     return;
+        // }
+        // Skill fertiliser = new Skill(player, SkillType.FERTILISER);
+        // if (fertiliser.getLevel() == 0) {
+        //     return;
+        // }
 
-        ParticleBuilder greenParticle = new ParticleBuilder(Particle.HAPPY_VILLAGER);
-        greenParticle.count(25).location(block.getLocation().toCenterLocation());
+        // Block block = event.getBlock();
+        // if (isCrop(block.getType())) {
 
-        if (fertiliser.isSuccessful()) {
-            int newAge = Math.min(fertiliser.getLevel() + 1, crop.getMaximumAge() - 1);
-            if (customStack != null) {
-                unitedSkills.getServer().getScheduler().runTask(unitedSkills, () -> {
-                    CustomCrop customCrop = CustomCrop.byAlreadyPlaced(block);
-                    if (customCrop != null) {
-                        final int age = Math.min(fertiliser.getLevel() + 1, customCrop.getMaxAge() - 1);
-                        customCrop.setAge(age);
-                    }
-                    greenParticle.spawn();
-                });
-                return;
-            }
-            crop.setAge(newAge);
-            block.setBlockData(crop);
-            greenParticle.spawn();
-        }
+        //     // Vanilla crop type
 
+
+
+        //     return;
+        // }
+
+
+
+
+
+
+
+
+
+
+
+        // Ageable crop = (Ageable) block.getBlockData();
+        // CustomStack customStack = CustomStack.byItemStack(event.getItemInHand());
+
+        // ParticleBuilder greenParticle = new ParticleBuilder(Particle.HAPPY_VILLAGER);
+        // greenParticle.count(25).location(block.getLocation().toCenterLocation());
+
+        // if (fertiliser.isSuccessful()) {
+        //     int newAge = Math.min(fertiliser.getLevel() + 1, crop.getMaximumAge() - 1);
+        //     if (customStack != null) {
+        //         unitedSkills.getServer().getScheduler().runTask(unitedSkills, () -> {
+        //             CustomCrop customCrop = CustomCrop.byAlreadyPlaced(block);
+        //             if (customCrop != null) {
+        //                 final int age = Math.min(fertiliser.getLevel() + 1, customCrop.getMaxAge() - 1);
+        //                 customCrop.setAge(age);
+        //             }
+        //             greenParticle.spawn();
+        //         });
+        //         return;
+        //     }
+        //     crop.setAge(newAge);
+        //     block.setBlockData(crop);
+        //     greenParticle.spawn();
+        // }
     }
 
     @EventHandler
@@ -244,7 +258,7 @@ public class FarmerAbilities implements Listener {
     public void onCropBreak(BlockBreakEvent event) {
         Material material = event.getBlock().getType();
         player = event.getPlayer();
-        if (isCrop(material)) {
+        if (!isCrop(material)) {
             return;
         }
         if (isFarmer()) {
@@ -286,7 +300,7 @@ public class FarmerAbilities implements Listener {
     public void onCropDrop(BlockDropItemEvent event) {
         @NotNull Material material = event.getBlockState().getType();
         player = event.getPlayer();
-        if (isCrop(material)) {
+        if (!isCrop(material)) {
             return;
         }
         if (isFarmer()) {
@@ -296,7 +310,7 @@ public class FarmerAbilities implements Listener {
         ActiveSkill greenThumb = new ActiveSkill(player, SkillType.GREEN_THUMB, cooldowns, durations);
 
         if (greenThumb.isSuccessful() && greenThumb.isActive()) {
-            if (isMaxAge(event.getBlock())) {
+            if (!isMaxAge(event.getBlock())) {
                 return;
             }
             for (Item item : event.getItems()) {
@@ -310,7 +324,7 @@ public class FarmerAbilities implements Listener {
                 if (item.getName().contains("Seeds")) {
                     return;
                 }
-                if (isMaxAge(event.getBlock())) {
+                if (!isMaxAge(event.getBlock())) {
                     return;
                 }
                 Utils.multiplyItem(player, item.getItemStack(), 1);
@@ -321,18 +335,18 @@ public class FarmerAbilities implements Listener {
     private boolean isMaxAge(@NotNull Block block) {
         BlockData dataPlant = block.getBlockData();
         if (!(dataPlant instanceof Ageable plant)) {
-            return true;
+            return false;
         }
-        if (isCrop(block.getType())) {
-            return true;
+        if (!isCrop(block.getType())) {
+            return false;
         }
-        return plant.getAge() != plant.getMaximumAge();
+        return plant.getAge() == plant.getMaximumAge();
     }
 
     private boolean isCrop(@NotNull Material material) {
         FileConfiguration configuration = getConfig();
         List<String> cropNames = configuration.getStringList("crop-names");
-        return !cropNames.contains(material.toString());
+        return cropNames.contains(material.toString());
     }
 
     private boolean isPlantFood(Material material) {

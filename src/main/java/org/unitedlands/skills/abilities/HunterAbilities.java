@@ -1,7 +1,6 @@
 package org.unitedlands.skills.abilities;
 
 import com.destroystokyo.paper.ParticleBuilder;
-import dev.lone.itemsadder.api.CustomStack;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -27,6 +26,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.unitedlands.UnitedLib;
 import org.unitedlands.skills.UnitedSkills;
 import org.unitedlands.skills.Utils;
 import org.unitedlands.skills.skill.ActiveSkill;
@@ -81,8 +81,8 @@ public class HunterAbilities implements Listener {
         if (entity.getType().equals(EntityType.ENDER_DRAGON)) {
             Skill leatherworking = new Skill(player, SkillType.LEATHERWORKING);
             if (leatherworking.isSuccessful()) {
-                CustomStack dragonScale = CustomStack.getInstance("masterwork:dragon_scale");
-                player.getInventory().addItem(dragonScale.getItemStack());
+                ItemStack dragonScale = UnitedLib.getInstance().getItemFactory().getItemStack("dragon_scale", 1);
+                player.getInventory().addItem(dragonScale);
                 leatherworking.notifyActivation();
             }
         }
