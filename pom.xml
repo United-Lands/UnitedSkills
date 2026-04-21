@@ -6,7 +6,7 @@
 
     <groupId>org.unitedlands</groupId>
     <artifactId>UnitedSkills</artifactId>
-    <version>3.10.1</version>
+    <version>3.11.3</version>
     <packaging>jar</packaging>
 
     <name>UnitedSkills</name>
@@ -128,12 +128,6 @@
             <groupId>com.palmergames.bukkit.towny</groupId>
             <artifactId>towny</artifactId>
             <version>0.102.0.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>dev.lone</groupId>
-            <artifactId>api-itemsadder</artifactId>
-            <version>4.0.10</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

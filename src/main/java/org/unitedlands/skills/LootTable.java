@@ -10,9 +10,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
+import org.unitedlands.UnitedLib;
 import org.unitedlands.skills.skill.Skill;
-
-import dev.lone.itemsadder.api.CustomStack;
 
 import java.util.*;
 
@@ -131,7 +130,7 @@ public class LootTable {
             addDamage(itemSection, item);
         } else {
             // Generate ItemStack from ItemsAdder CustomStack
-            item = CustomStack.getInstance(ia).getItemStack();
+            item = UnitedLib.getInstance().getItemFactory().getItemStack(ia, amount);
         }
         item.setAmount(amount);
 

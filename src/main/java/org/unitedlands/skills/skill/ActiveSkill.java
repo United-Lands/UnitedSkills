@@ -1,6 +1,5 @@
 package org.unitedlands.skills.skill;
 
-import dev.lone.itemsadder.api.CustomStack;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -10,6 +9,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.unitedlands.UnitedLib;
 import org.unitedlands.skills.events.SkillActivateEvent;
 
 import java.util.ArrayList;
@@ -94,11 +94,13 @@ public class ActiveSkill extends Skill {
 
     private boolean hasFullMasterworkSet() {
         ArrayList<ItemStack> masterworkSet = new ArrayList<>();
-        masterworkSet.add(CustomStack.getInstance("masterwork:masterwork_sword").getItemStack());
-        masterworkSet.add(CustomStack.getInstance("masterwork:masterwork_pickaxe").getItemStack());
-        masterworkSet.add(CustomStack.getInstance("masterwork:masterwork_axe").getItemStack());
-        masterworkSet.add(CustomStack.getInstance("masterwork:masterwork_shovel").getItemStack());
-        masterworkSet.add(CustomStack.getInstance("masterwork:masterwork_hoe").getItemStack());
+        var itemFactory = UnitedLib.getInstance().getItemFactory();
+
+        masterworkSet.add(itemFactory.getItemStack("masterwork_sword", 1));
+        masterworkSet.add(itemFactory.getItemStack("masterwork_pickaxe", 1));
+        masterworkSet.add(itemFactory.getItemStack("masterwork_axe", 1));
+        masterworkSet.add(itemFactory.getItemStack("masterwork_shovel", 1));
+        masterworkSet.add(itemFactory.getItemStack("masterwork_hoe", 1));
 
         List<ItemStack> inventoryContents = Arrays.stream(player.getInventory().getContents()).toList();
         return new HashSet<>(inventoryContents).containsAll(masterworkSet);
