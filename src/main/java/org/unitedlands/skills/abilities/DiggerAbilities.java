@@ -6,6 +6,7 @@ import com.gamingmesh.jobs.actions.BlockActionInfo;
 import com.gamingmesh.jobs.container.ActionType;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
@@ -233,14 +234,8 @@ public class DiggerAbilities implements Listener {
 
             Material neighbourBlockType = neighbourBlock.getType();
 
-            // Some extra block checks.
-            if (neighbourBlockType.isInteractable() && !(neighbourBlockType.equals(Material.REDSTONE_ORE)
-                    || neighbourBlockType.equals(Material.DEEPSLATE_REDSTONE_ORE)))
-                continue;
-            if (neighbourBlockType == Material.BEDROCK || neighbourBlockType == Material.END_PORTAL
-                    || neighbourBlockType == Material.END_PORTAL_FRAME)
-                continue;
-            if (neighbourBlockType == Material.OBSIDIAN && neighbourBlockType != block.getType())
+            // Ensure the block is specifically designed to be mined by a shovel.
+            if (!Tag.MINEABLE_SHOVEL.isTagged(neighbourBlockType))
                 continue;
 
             spawnBlockBreakParticles(neighbourBlock);
