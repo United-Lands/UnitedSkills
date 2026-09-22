@@ -6,13 +6,13 @@ import com.gamingmesh.jobs.actions.BlockActionInfo;
 import com.gamingmesh.jobs.container.ActionType;
 import com.palmergames.bukkit.towny.object.TownyPermission;
 import com.palmergames.bukkit.towny.utils.PlayerCacheUtil;
-import com.songoda.ultimatetimber.UltimateTimber;
-import com.songoda.ultimatetimber.events.TreeFallEvent;
-import com.songoda.ultimatetimber.manager.SaplingManager;
-import com.songoda.ultimatetimber.tree.DetectedTree;
-import com.songoda.ultimatetimber.tree.ITreeBlock;
-import com.songoda.ultimatetimber.tree.TreeDefinition;
+import com.songoda.ultimatetimber.api.UltimateTimberApi;
+import com.songoda.ultimatetimber.api.event.TreeFallEvent;
 
+import com.songoda.ultimatetimber.api.manager.SaplingManager;
+import com.songoda.ultimatetimber.api.tree.DetectedTree;
+import com.songoda.ultimatetimber.api.tree.TreeBlock;
+import com.songoda.ultimatetimber.api.tree.TreeDefinition;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -74,7 +74,7 @@ public class WoodcutterAbilities implements Listener {
             return;
         }
         int counter = 0;
-        for (ITreeBlock<Block> treeBlock : event.getDetectedTree().getDetectedTreeBlocks().getLogBlocks()) {
+        for (TreeBlock<Block> treeBlock : event.getDetectedTree().getDetectedTreeBlocks().getLogBlocks()) {
             if (counter > 10) {
                 break;
             }
@@ -88,12 +88,12 @@ public class WoodcutterAbilities implements Listener {
             return;
         }
         if (reforestation.isSuccessful()) {
-            SaplingManager saplingManager = getUltimateTimber().getSaplingManager();
+            SaplingManager saplingManager = UltimateTimberApi.getSaplingManager();
             DetectedTree tree = event.getDetectedTree();
             Bukkit.getScheduler().runTask(unitedSkills, () -> {
                 try {
                     Method internalReplant = saplingManager.getClass().getDeclaredMethod("internalReplant",
-                            TreeDefinition.class, ITreeBlock.class);
+                            TreeDefinition.class, TreeBlock.class);
                     internalReplant.setAccessible(true);
                     internalReplant.invoke(saplingManager, tree.getTreeDefinition(),
                             tree.getDetectedTreeBlocks().getInitialLogBlock());
@@ -136,10 +136,6 @@ public class WoodcutterAbilities implements Listener {
             }
             multiplyItem(player, new ItemStack(material), 2);
         }
-    }
-
-    private UltimateTimber getUltimateTimber() {
-        return (UltimateTimber) Bukkit.getPluginManager().getPlugin("UltimateTimber");
     }
 
     private boolean isWoodCutter() {
