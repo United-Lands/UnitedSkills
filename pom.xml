@@ -1,110 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns="http://maven.apache.org/POM/4.0.0"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.unitedlands</groupId>
+    <parent>
+        <groupId>org.unitedlands</groupId>
+        <artifactId>united-root</artifactId>
+        <version>0</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
     <artifactId>UnitedSkills</artifactId>
     <version>3.11.6</version>
-    <packaging>jar</packaging>
-
-    <name>UnitedSkills</name>
-
-    <description>A plugin built to manage job skills for United Lands</description>
-    <properties>
-        <java.version>25</java.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-    <url>unitedlands.org</url>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.15.0</version>
-                <configuration>
-                    <source>25</source>
-                    <target>25</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.6.2</version>
-                <configuration>
-                    <relocations>
-                        <relocation>
-                            <pattern>dev.triumphteam.gui</pattern>
-                            <shadedPattern>org.unitedlands.skills.gui</shadedPattern>
-                        </relocation>
-                    </relocations>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
-    </build>
 
     <repositories>
         <repository>
-            <id>triumph-guis</id>
-            <url>https://repo.triumphteam.dev/releases</url>
-        </repository>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
-        </repository>
-        <repository>
-            <id>papermc</id>
-            <url>https://repo.papermc.io/repository/maven-public/</url>
-        </repository>
-        <repository>
-            <id>sonatype</id>
-            <url>https://oss.sonatype.org/content/groups/public/</url>
-        </repository>
-        <repository>
             <id>placeholderapi</id>
-            <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+            <url>https://repo.helpch.at/releases/</url>
         </repository>
         <repository>
-            <id>nexus</id>
-            <name>Lumine Releases</name>
+            <id>lumine-releases</id>
             <url>https://mvn.lumine.io/repository/maven-public/</url>
-        </repository>
-        <repository>
-            <id>codemc-repo</id>
-            <url>https://repo.codemc.io/repository/maven-public/</url>
-            <layout>default</layout>
-        </repository>
-        <repository>
-            <id>glaremasters repo</id>
-            <url>https://repo.glaremasters.me/repository/towny/</url>
-        </repository>
-        <repository>
-            <id>matteodev</id>
-            <url>https://maven.devs.beer/</url>
         </repository>
     </repositories>
 
     <dependencies>
+        <!-- declared first: Mythic-Dist bundles its own broken NotNull, keep the real one ahead of it -->
         <dependency>
-            <groupId>io.papermc.paper</groupId>
-            <artifactId>paper-api</artifactId>
-            <version>[26.2.build,)</version>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>26.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.unitedlands</groupId>
+            <artifactId>UnitedLib</artifactId>
+            <version>1.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -116,30 +48,24 @@
         <dependency>
             <groupId>com.github.Zrips</groupId>
             <artifactId>CMILib</artifactId>
-            <version>1.5.7.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.songoda</groupId>
-            <artifactId>ultimatetimber</artifactId>
-            <version>4.6.0</version>
+            <version>1.5.9.6</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.palmergames.bukkit.towny</groupId>
             <artifactId>towny</artifactId>
-            <version>0.103.0.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>me.clip</groupId>
             <artifactId>placeholderapi</artifactId>
-            <version>2.10.9</version>
+            <version>2.12.3</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.unitedlands</groupId>
-            <artifactId>UnitedLib</artifactId>
-            <version>1.0</version>
+            <groupId>com.songoda</groupId>
+            <artifactId>UltimateTimber-API</artifactId>
+            <version>5.0.0-SNAPSHOT</version> 
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -152,7 +78,6 @@
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
             <version>2.6</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>de.tr7zw</groupId>
@@ -163,7 +88,6 @@
         <dependency>
             <groupId>net.luckperms</groupId>
             <artifactId>api</artifactId>
-            <version>5.4</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
